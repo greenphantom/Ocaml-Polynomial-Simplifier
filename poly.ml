@@ -19,8 +19,24 @@ type pExp =
   Function to traslate betwen AST expressions
   to pExp expressions
 *)
-let from_expr (_e: Expr.expr) : pExp =
-    Term(0,0) (* TODO *)
+let rec from_expr (_e: Expr.expr) : pExp = match _e with 
+  | Num(i) -> Term(i,0)
+  | Var(c) -> Term(1,1)
+  | Add(e1,e2) -> let _e1 = from_expr e1 in let _e2 = from_expr e2 in match _e1, _e2 with
+    | (Term(c1,v1), Term(c2,v2)) -> if (v1 = v2) then Term(c1+c2,v1) else Plus([_e1; _e2])
+    | _ -> Plus([_e1; _e2])
+  | Sub(e1,e2) -> Plus([from_expr e1; from_expr Neg(e2)]) (* TODO *)
+  | Mul(e1,e2) -> let _e1 = from_expr e1 in let _e2 = from_expr e2 in match _e1, _e2 with
+    | (Term(c1,v1), Term(c2,v2)) -> Term(c1*c2,v1+v2)
+    | _ -> Times([_e1; _e2])
+  | Pow(e,i) -> let _ex = from_expr e in match _ex with 
+    | Term(c,p) -> Term(c ** i, p * i)
+    | Plus(plist) -> Term (0,0) (* TODO *)
+  | Pos(e) -> from_expr e;
+  | Neg(e) -> let _n = from_expr e in match _n with 
+    | Term(c,v) -> Term(-1*c,v)
+    | _ -> Times(Term(-1,0);_n)
+  | _ -> Term(0,0) (* TODO *);;
 
 (* 
   Compute degree of a polynomial expression.
@@ -49,10 +65,12 @@ let compare (e1: pExp) (e2: pExp) : bool =
   Hint 1: Print () around elements that are not Term() 
   Hint 2: Recurse on the elements of Plus[..] or Times[..]
 *)
-let print_pExp (_e: pExp): unit =
+let print_pExp (_e: pExp): unit = match _e with 
+  | Term(x1,x2) ->  Printf.printf "%i * x ^ %i " x1 x2;
+  | _ -> Printf.printf "Not implemented\n" ;; 
+
   (* TODO *)
-  Printf.printf("Not implemented");
-  print_newline()
+  
 
 (* 
   Function to simplify (one pass) pExpr
