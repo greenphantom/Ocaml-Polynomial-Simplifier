@@ -30,11 +30,11 @@ let rec from_expr (_e: Expr.expr) : pExp = match _e with
     | _ -> Times([_e1; _e2])
   | Pow(e,i) -> let _ex = from_expr e in match _ex with 
     | Term(c,p) -> Term(c ** i, p * i)
-    | Plus(plist) -> Term (0,0) (* TODO *)
-  | Pos(e) -> from_expr e;
+    | Plus(plist) -> Term (0,0) (* TODO *)*)
+  (* | Pos(e) -> from_expr e;
   | Neg(e) -> let _n = from_expr e in match _n with 
     | Term(c,v) -> Term(-1*c,v)
-    | _ -> Times(Term(-1,0);_n) *)
+    | _ -> Times([Term(-1,0);_n]) *)
   | _ -> Term(0,0) (* TODO *);;
 
 (* 
@@ -64,22 +64,28 @@ let compare (e1: pExp) (e2: pExp) : bool =
   Hint 1: Print () around elements that are not Term() 
   Hint 2: Recurse on the elements of Plus[..] or Times[..]
 *)
-let rec print_pExp (_e: pExp): unit = match _e with 
+let rec do_print (_e: pExp): unit = match _e with 
   | Term(x1,x2) ->  if (x2 = 0) then Printf.printf "%i" x1 else Printf.printf "%ix^%i" x1 x2;
   | Plus(plist) ->
     match plist with 
       | [] -> ();
-      | [_t] -> print_pExp _t; 
+      | [_t] -> do_print _t; 
       | _t::tl ->  match _t with 
         | pExp -> 
           Printf.printf "(";
-          print_pExp _t;
+          do_print _t;
           Printf.printf " + ";
-          print_pExp (Plus(tl));
+          do_print (Plus(tl));
           Printf.printf ")";
         | _ -> ();
-  | _ -> Printf.printf "Not implemented\n" ;
+  | _ -> Printf.printf "Not implemented\n" ;;
+
+let print_pExp (_e: pExp): unit = 
+  do_print _e;
   Printf.printf "\n";;
+
+
+
 
   (* TODO *)
   
