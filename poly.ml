@@ -79,7 +79,7 @@ let rec print_pExp (_e: pExp): unit = match _e with
           Printf.printf ")";
         | _ -> ();
   | _ -> Printf.printf "Not implemented\n" ;
-  Printf.printf "\n";
+  Printf.printf "\n";;
 
   (* TODO *)
   
@@ -102,14 +102,14 @@ let rec print_pExp (_e: pExp): unit = match _e with
   Hint 6: Find other situations that can arise
 *)
 let simplify1 (e:pExp): pExp =
-    e
+    e;;
 
 (* 
   Compute if two pExp are the same 
   Make sure this code works before you work on simplify1  
 *)
 let equal_pExp (_e1: pExp) (_e2: pExp) :bool =
-  true
+  true;;
 
 (* Fixed point version of simplify1 
   i.e. Apply simplify1 until no 
@@ -122,7 +122,7 @@ let rec simplify (e:pExp): pExp =
         e
       else  
         simplify(rE)
-
+;;
 
 
 
