@@ -23,9 +23,9 @@ type pExp =
 *)
 ;;
 
-let rec pow_to_plus (_e: pExp) (_p: pExp list) (_i: int) : pExp = 
+let rec from_pow (_e: pExp) (_p: pExp list) (_i: int) : pExp = 
     (if(_i > 1) then 
-      (pow_to_plus _e ([_e]@_p) (_i - 1))
+      (from_pow _e ([_e]@_p) (_i - 1))
     else
       Times(_p)) ;;
 
@@ -40,7 +40,8 @@ let rec from_expr (_e: Expr.expr) : pExp = match _e with
     | _ -> Times([_e1; _e2]))
   | Pow(e,i) -> (let _ex = from_expr e in match _ex with 
     | Term(c,p) -> Term((float_of_int c) ** (float_of_int i) |> int_of_float, p * i)
-    | Plus(plist) -> (pow_to_plus (from_expr e) (plist) i)
+    | Plus(plist) -> (from_pow (from_expr e) (plist) i)
+    | Times(plist) -> (from_pow (from_expr e) (plist) i)
     | _ -> Term (0, 0)) (* TODO *)
   | Pos(e) -> from_expr e; 
   | Neg(e) -> (let _n = from_expr e in match _n with 
