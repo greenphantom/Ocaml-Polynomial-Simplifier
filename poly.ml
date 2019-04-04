@@ -21,6 +21,14 @@ type pExp =
   Function to traslate betwen AST expressions
   to pExp expressions
 *)
+;;
+
+let rec pow_to_plus (_e: pExp) (_p: pExp list) (_i: int) : pExp = 
+    (if(_i > 1) then 
+      (pow_to_plus _e ([_e]@_p) (_i - 1))
+    else
+      Times(_p)) ;;
+
 let rec from_expr (_e: Expr.expr) : pExp = match _e with 
   | Num(i) -> Term(i,0);
   | Var(c) -> Term(1,1);
@@ -32,7 +40,7 @@ let rec from_expr (_e: Expr.expr) : pExp = match _e with
     | _ -> Times([_e1; _e2]))
   | Pow(e,i) -> (let _ex = from_expr e in match _ex with 
     | Term(c,p) -> Term((float_of_int c) ** (float_of_int i) |> int_of_float, p * i)
-    | Plus(plist) -> Term (0,0) 
+    | Plus(plist) -> (pow_to_plus (from_expr e) (plist) i)
     | _ -> Term (0, 0)) (* TODO *)
   | Pos(e) -> from_expr e; 
   | Neg(e) -> (let _n = from_expr e in match _n with 
@@ -54,6 +62,7 @@ let degree (_e:pExp): int = 0 (* TODO *)
   to "normalize them". This way, terms that need to be reduced
   show up one after another.
   *)
+  ;;
 let compare (e1: pExp) (e2: pExp) : bool =
   degree e1 > degree e2
 
@@ -67,6 +76,7 @@ let compare (e1: pExp) (e2: pExp) : bool =
   Hint 1: Print () around elements that are not Term() 
   Hint 2: Recurse on the elements of Plus[..] or Times[..]
 *)
+  ;;
 let rec do_print (_e: pExp): unit = match _e with 
   | Term(x1,x2) ->  if (x2 = 0) then Printf.printf "%i" x1 else Printf.printf "%ix^%i" x1 x2;
   | Plus(plist) ->
@@ -89,7 +99,7 @@ let rec do_print (_e: pExp): unit = match _e with
         | pExpr ->
           Printf.printf "(";
           do_print _t;
-          Printf.printf " + ";
+          Printf.printf " * ";
           do_print (Times(tl));
           Printf.printf ")";
         | _ -> ();)
