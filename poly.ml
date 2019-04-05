@@ -135,9 +135,7 @@ let rec do_print (_e: pExp): unit = match _e with
       | _t::tl -> match _t with
         | pExpr ->
           Printf.printf "(";
-          do_print _t;
-          Printf.printf " * ";
-          do_print (Times(tl));
+          print_times plist;
           Printf.printf ")";
         | _ -> ();)
   | _ -> Printf.printf "Not implemented\n" 
@@ -151,6 +149,18 @@ and print_sum (_sum: pExp list): unit = (match _sum with
           do_print _t;
           Printf.printf " + ";
           print_sum tl;
+        | _ -> ());  
+)
+
+and print_times (_mul: pExp list): unit = (match _mul with
+  | [] -> ();
+  | [_t] -> do_print _t; 
+  | _t::tl ->  
+    (match _t with 
+        | pExp -> 
+          do_print _t;
+          Printf.printf " * ";
+          print_times tl;
         | _ -> ());  
 );;
 
