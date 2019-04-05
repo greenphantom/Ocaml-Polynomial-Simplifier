@@ -67,35 +67,27 @@ let rec from_expr (_e: expr) : pExp = match _e with
 
 let rec total_exponent (_v: int) (_p: pExp list) : int =
   match _p with
-    | [] -> 0
+    | [] -> _v
     | t::tl -> (match t with
       | Term(c,v) -> total_exponent (_v + v) tl;
-      | Plus(plist) -> total_exponent (largest_exponent 0 plist) tl;
-      | Mul(plist) -> total_exponent (total_exponent 0 plist) tl;)
+      | Plus(plist) -> total_exponent (total_exponent _v plist) tl;
+      | Times(plist) -> total_exponent (total_exponent _v plist) tl;)
 
   and largest_exponent (_v: int) (_p: pExp list) : int = 
     match _p with
       | [] -> _v
       | t::tl -> (match t with
                   | Term(c,v) -> if (v > _v) then largest_exponent v tl else largest_exponent _v tl;
-                  | Plus(plist) -> largest_exponent (largest_exponent 0 plist) tl;
-                  | Mul(plist) -> largest_exponent (total_exponent 0 plist) tl;)
+                  | Plus(plist) -> largest_exponent (largest_exponent _v plist) tl;
+                  | Times(plist) -> largest_exponent (total_exponent _v plist) tl;)
 
 
-let rec degree (_e: pExp): int = 
-  match _e with
+let rec degree (_e: pExp): int = 0
+ (* match _e with
     | Term(c,v) -> v
     | Plus(plist) -> (match plist with
       | [] -> 0;
-      | _ -> largest_exponent 0 plist);
-
-  and largest_exponent (_v: int) (_p: pExp list) : int =
-    match _p with
-      | [t] -> if (degree t) > _v then (degree t) else _v;
-      | t::tl -> (largest_expontent _v t); largest_exponent ;
-      | Term(c,v) -> if v > _v then v else _v;
-      | _ -> degree _e;
-  ;;
+      | _ -> largest_exponent 0 plist);*)
 
 (* 
   Comparison function useful for sorting of Plus[..] args 
