@@ -86,7 +86,7 @@ let degree (_e: pExp): int =
   match _e with
     | Term(c,v) -> v
     | Plus(plist) -> total_exponent 0 plist
-    | Times(plist) -> largest_exponent 0 plist
+    | Times(plist) -> largest_exponent 0 plist;;
 
 (* 
   Comparison function useful for sorting of Plus[..] args 
@@ -94,8 +94,10 @@ let degree (_e: pExp): int =
   show up one after another.
   *)
 
-let compare (e1: pExp) (e2: pExp) : bool =
-  degree e1 > degree e2
+let compare (e1: pExp) (e2: pExp) : int = 
+  let d1 = degree e1 in
+    let d2 = degree e2 in 
+      if (d1 > d2) then -1 else if (d1 = d2) then 0 else 1;;
 
 (* Print a pExpr nicely 
   Term(3,0) -> 3
