@@ -82,12 +82,11 @@ let rec total_exponent (_v: int) (_p: pExp list) : int =
                   | Times(plist) -> largest_exponent (total_exponent _v plist) tl;)
 
 
-let rec degree (_e: pExp): int = 0
- (* match _e with
+let degree (_e: pExp): int = 
+  match _e with
     | Term(c,v) -> v
-    | Plus(plist) -> (match plist with
-      | [] -> 0;
-      | _ -> largest_exponent 0 plist);*)
+    | Plus(plist) -> total_exponent 0 plist
+    | Times(plist) -> largest_exponent 0 plist
 
 (* 
   Comparison function useful for sorting of Plus[..] args 
@@ -95,8 +94,8 @@ let rec degree (_e: pExp): int = 0
   show up one after another.
   *)
 
-(*let compare (e1: pExp) (e2: pExp) : bool =
-  degree e1 > degree e2*)
+let compare (e1: pExp) (e2: pExp) : bool =
+  degree e1 > degree e2
 
 (* Print a pExpr nicely 
   Term(3,0) -> 3
