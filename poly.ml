@@ -78,6 +78,7 @@ let compare (e1: pExp) (e2: pExp) : bool =
   Hint 2: Recurse on the elements of Plus[..] or Times[..]
 *)
   ;;
+
 let rec do_print (_e: pExp): unit = match _e with 
   | Term(x1,x2) ->  if (x2 = 0) then Printf.printf "%i" x1 else Printf.printf "%ix^%i" x1 x2;
   | Plus(plist) ->
@@ -87,9 +88,7 @@ let rec do_print (_e: pExp): unit = match _e with
       | _t::tl ->  match _t with 
         | pExp -> 
           Printf.printf "(";
-          do_print _t;
-          Printf.printf " + ";
-          do_print (Plus(tl));
+          print_sum plist;
           Printf.printf ")";
         | _ -> ();)
   | Times(plist) -> 
@@ -104,7 +103,19 @@ let rec do_print (_e: pExp): unit = match _e with
           do_print (Times(tl));
           Printf.printf ")";
         | _ -> ();)
-  | _ -> Printf.printf "Not implemented\n" ;;
+  | _ -> Printf.printf "Not implemented\n" 
+
+and print_sum (_sum: pExp list): unit = (match _sum with
+  | [] -> ();
+  | [_t] -> do_print _t; 
+  | _t::tl ->  
+    (match _t with 
+        | pExp -> 
+          do_print _t;
+          Printf.printf " + ";
+          print_sum tl;
+        | _ -> ());  
+);;
 
 let print_pExp (_e: pExp): unit = 
   do_print _e;
