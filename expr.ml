@@ -7,6 +7,7 @@ type expr =
   | Pow of expr*int
   | Pos of expr
   | Neg of expr
+  ;;
 
 let rec 
   print_op1 c e = 
@@ -34,6 +35,7 @@ and
         Printf.printf ")^%d" i;
       | Pos(e) -> print_op1 "+" e
       | Neg(e) -> print_op1 "-" e
+      ;;
 
 (*
   Print expression and pass it through
@@ -42,3 +44,4 @@ let print_expr (e:expr) :expr =
   print_expr_r e;
   print_newline ();
   e
+  ;;
