@@ -29,11 +29,16 @@ let rec from_pow (_e: pExp) (_p: pExp list) (_i: int) : pExp =
     else
       Times(_p)) ;;
 
-let rec from_expr (_e: Expr.expr) : pExp = match _e with 
+let rec from_expr (_e: expr) : pExp = match _e with 
   | Num(i) -> Term(i,0);
   | Var(c) -> Term(1,1);
   | Add(e1,e2) -> 
-    let _e1 = from_expr e1 in let _e2 = from_expr e2 in Plus([_e1; _e2]);
+    let _e1 = from_expr e1 in let _e2 = from_expr e2 in (match _e1, _e2 with
+      | Term(c1, v1), Term(c2, v2) -> if (v1 = v2) then Term(c1 + c2, v2) else Plus([_e1; _e2])
+      | Term(c1, v1), Plus(plist) -> Plus([_e1]@plist)
+      | Plus(plist), Term(c2, v2) -> Plus(plist@[_e2])
+      | Plus(plist1), Plus(plist2) -> Plus(plist1@plist2)
+      | _ -> Plus([_e1; _e2]))
   | Sub(e1,e2) -> Plus([(from_expr e1); (from_expr (Neg(e2)))]) 
   | Mul(e1,e2) -> (let _e1 = from_expr e1 in let _e2 = from_expr e2 in match _e1, _e2 with
     | (Term(c1,v1), Term(c2,v2)) -> Term(c1*c2,v1+v2)
@@ -56,16 +61,49 @@ let rec from_expr (_e: Expr.expr) : pExp = match _e with
   Hint 2: Degree of Plus[...] is the max of the degree of args
   Hint 3: Degree of Times[...] is the sum of the degree of args 
 *)
-let degree (_e:pExp): int = 0 (* TODO *)
+
+
+(*let rec total_exponent (_v: int) (_p: pExp list) : int =
+  match _p with
+    | [] -> 0
+    | [t] -> (match t with
+                | Term(c,v) -> (_v + v)
+                | Plus(plist) -> largest_exponent 0 plist
+                | Mul(plist) -> total_exponent 0 plist)
+    | t::tl -> 
+
+  and largest_exponent (_v: int) (_p: pExp list) : int = 
+    match _p with
+      | [] -> 0
+      | [t] -> (match t with
+                  | Term(c,v) -> if (v > _v) then v else _v
+                  | Plus(plist) -> largest_exponent 0 plist
+                  | Mul(plist) -> total_exponent 0 plist)
+      | t::tl -> 
+
+
+let rec degree (_e: pExp): int = 
+  match _e with
+    | Term(c,v) -> v
+    | Plus(plist) -> (match plist with
+      | [] -> 0
+      | _ -> largest_exponent 0 plist)
+
+  and largest_exponent (_v: int) (_p: pExp list) : int =
+    match _p with
+      | [t] -> if (degree t) > _v then (degree t) else _v
+      | t::tl -> (largest_expontent _v t); largest_exponent 
+      | Term(c,v) -> if v > _v then v else _v
+      | _ -> degree _e*)
 
 (* 
   Comparison function useful for sorting of Plus[..] args 
   to "normalize them". This way, terms that need to be reduced
   show up one after another.
   *)
-  ;;
-let compare (e1: pExp) (e2: pExp) : bool =
-  degree e1 > degree e2
+
+(*let compare (e1: pExp) (e2: pExp) : bool =
+  degree e1 > degree e2*)
 
 (* Print a pExpr nicely 
   Term(3,0) -> 3
@@ -77,8 +115,7 @@ let compare (e1: pExp) (e2: pExp) : bool =
   Hint 1: Print () around elements that are not Term() 
   Hint 2: Recurse on the elements of Plus[..] or Times[..]
 *)
-  ;;
-
+  
 let rec do_print (_e: pExp): unit = match _e with 
   | Term(x1,x2) ->  if (x2 = 0) then Printf.printf "%i" x1 else Printf.printf "%ix^%i" x1 x2;
   | Plus(plist) ->
