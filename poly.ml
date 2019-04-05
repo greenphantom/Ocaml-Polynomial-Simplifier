@@ -190,8 +190,12 @@ let simplify1 (e:pExp): pExp =
   Compute if two pExp are the same 
   Make sure this code works before you work on simplify1  
 *)
-let equal_pExp (_e1: pExp) (_e2: pExp) :bool =
-  true;;
+let equal_pExp (_e1: pExp) (_e2: pExp) : bool =
+  (match _e1, _e2 with 
+    | Term(c1, v1), Term(c2,v2) -> _e1 = _e2
+    | Plus(plist1), Plus(plist2) -> Plus(List.sort compare plist1) = Plus(List.sort compare plist2)
+    | Times(plist1), Times(plist2) -> Times(List.sort compare plist1) = Times(List.sort compare plist2)
+    | _ -> false)
 
 (* Fixed point version of simplify1 
   i.e. Apply simplify1 until no 
