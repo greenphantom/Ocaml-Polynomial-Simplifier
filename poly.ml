@@ -172,6 +172,8 @@ let rec sort (_s: pExp): pExp = (match _s with
   | Plus(plist) -> Plus(List.sort compare (List.map sort plist))
   | Times(plist) -> Times(List.sort compare (List.map sort plist)));;
 
+(* Sum flattening operations *)
+
 let get_plist (_s: pExp): pExp list = (match _s with 
   | Plus(alist) -> alist;
   | _ -> [_s]);;
@@ -187,6 +189,24 @@ let rec sep (l: pExp list) (run: pExp list): pExp list = (match l with
 let flatten_sum (_s: pExp): pExp = (match _s with
   | Plus(plist) -> Plus(sep plist []);
   | _ -> _s);;
+
+(* Multiply flatten opertations *)
+
+let get_mlist (_m: pExp): pExp list = (match _m with 
+  | Times(alist) -> alist;
+  | _ -> [_m]);;
+
+let has_Times (l: pExp list): bool = let x = (List.filter (function pExp -> match pExp with Times(plist) -> false | _ -> true) l) in (match x with 
+  | [] -> true;
+  | _ -> false);;
+
+let rec combine (l: pExp list) (run: pExp list): pExp list = (match l with 
+  | [] -> run;
+  | a::tl -> if (has_Times [a]) then combine (get_mlist a @ tl) run else combine tl (run @ [a]));;
+
+let flatten_multiply (_m: pExp): pExp = (match _m with
+  | Times(plist) -> Times(combine plist []);
+  | _ -> _m);;
 
 (* 
   Function to simplify (one pass) pExpr
