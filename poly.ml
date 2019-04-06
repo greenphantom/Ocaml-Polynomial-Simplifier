@@ -167,6 +167,26 @@ let print_pExp (_e: pExp): unit =
 
   (* TODO *)
   
+let rec sort (_s: pExp): pExp = (match _s with
+  | Term(c,v) -> _s;
+  | Plus(plist) -> Plus(List.sort compare (List.map sort plist))
+  | Times(plist) -> Times(List.sort compare (List.map sort plist)));;
+
+let get_plist (_s: pExp): pExp list = (match _s with 
+  | Plus(alist) -> alist;
+  | _ -> [_s]);;
+
+let has_Plus (l: pExp list): bool = let x = (List.filter (function pExp -> match pExp with Plus(plist) -> false | _ -> true) l) in (match x with 
+  | [] -> true;
+  | _ -> false);;
+
+let rec sep (l: pExp list) (run: pExp list): pExp list = (match l with 
+  | [] -> run;
+  | a::tl -> if (has_Plus [a]) then sep (get_plist a @ tl) run else sep tl (run @ [a]));;
+
+let flatten_sum (_s: pExp): pExp = (match _s with
+  | Plus(plist) -> Plus(sep plist []);
+  | _ -> _s);;
 
 (* 
   Function to simplify (one pass) pExpr
@@ -185,8 +205,12 @@ let print_pExp (_e: pExp): unit =
       => Plus[Term(2,3); Term(6,5)]
   Hint 6: Find other situations that can arise
 *)
-let simplify1 (e:pExp): pExp =
-    e;;
+let simplify1 (e:pExp): pExp = 
+  sort e;;
+  (* let s = sort e in
+    (match s with 
+      | Term(c,v) -> s;
+      | Plus(plist) ->  *)
 
 (* 
   Compute if two pExp are the same 
@@ -199,10 +223,7 @@ let equal_pExp (_e1: pExp) (_e2: pExp) : bool =
     | Times(plist1), Times(plist2) -> Times(List.sort compare plist1) = Times(List.sort compare plist2)
     | _ -> false);;
 
-let rec sort (_s: pExp): pExp = match _s with
-  | Term(c,v) -> _s;
-  | Plus(plist) -> Plus(List.sort compare (List.map sort plist))
-  | Times(plist) -> Times(List.sort compare (List.map sort plist));;
+
 
 (* Fixed point version of simplify1 
   i.e. Apply simplify1 until no 
