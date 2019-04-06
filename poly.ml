@@ -226,19 +226,35 @@ let flatten_multiply (_m: pExp): pExp = (match _m with
   Hint 6: Find other situations that can arise
 *)
 
-let rec simplify_add (e: pExp list) : pExp = 
+let rec simplify_add (e: pExp list) (run: pExp list) : pExp = 
   match e with 
     | t1::t2::tl -> (match t1, t2 with
-      | Term(c1, v1), Term(c2, v2) -> if (v1 = v2) then (simplify_add ([Term(c1 + c2, v1)]@tl)) else simplify_add ([t2]@tl)
-      | _ -> Plus(e))
-    | _ -> Plus(e)
+      | Term(c1, v1), Term(c2, v2) -> if (v1 = v2)
+                                      then let t = Term(c1 + c2, v1) in 
+                                        simplify_add ([t]@tl) (run)
+                                        else simplify_add ([t2]@tl) (run@[t1])
+      | _ -> Plus(run))
+    | [t] -> Plus(run@[t])
+    | _ -> Plus(run)
 
 let simplify1 (e:pExp): pExp =
   (match e with
     | Term(c,v) -> e
-    | Plus(plist) -> (let _e = sort e in match _e with 
-                                        | Plus(plist1) -> simplify_add plist1)
+    | Plus(plist) -> (let _e = sort (flatten_sum e) in match _e with 
+                                        | Plus(plist1) -> simplify_add plist1 [])
     | _ -> e)
+
+(* 
+  Compute if two pExp are the same 
+  Make sure this code works before you work on simplify1  
+*)
+let equal_pExp (_e1: pExp) (_e2: pExp) : bool =
+  (match _e1, _e2 with 
+    | Term(c1, v1), Term(c2,v2) -> _e1 = _e2
+    | Plus(plist1), Plus(plist2) -> Plus(List.sort compare plist1) = Plus(List.sort compare plist2)
+    | Times(plist1), Times(plist2) -> Times(List.sort compare plist1) = Times(List.sort compare plist2)
+    | _ -> false);;
+
 
 (* Fixed point version of simplify1 
   i.e. Apply simplify1 until no 
