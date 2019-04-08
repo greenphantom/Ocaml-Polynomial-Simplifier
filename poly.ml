@@ -268,7 +268,7 @@ let rec simplify1 (e:pExp): pExp =
     | Times(plist) -> Plus(acc_times plist)(*(match plist with
                         | t1::t2::tl -> simplify1 (Times([(expand_multiply t1 t2)]@tl))
                         | [t] -> simplify1 t)*)
-    | _ -> e)
+    | _ -> e);;
 
 (* 
   Compute if two pExp are the same 
