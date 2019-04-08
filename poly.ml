@@ -247,7 +247,7 @@ let rec acc_times (p: pExp list): pExp list =
   match p with 
     | t1::t2::tl -> let e = (expand_multiply t1 t2) in acc_times ([e]@tl)
     | [t] -> [t]
-    | _ -> p
+    | _ -> p;;
 
 let rec simplify1 (e:pExp): pExp =
   (match e with
@@ -267,7 +267,7 @@ let rec simplify1 (e:pExp): pExp =
           | Times(plist), Term(c2,v2) -> simplify_add tl ([simplify1 (Plus([(simplify1 t1); t2]))]@run)
           | Times(plist1), Times(plist2) -> simplify_add tl ([simplify1 (Plus([(simplify1 t1); (simplify1 t2)]))]@run))
         | [t] -> Plus(run@[t])
-        | _ -> Plus(run))
+        | _ -> Plus(run));;
 
 (* 
   Compute if two pExp are the same 
