@@ -237,11 +237,24 @@ let rec simplify_add (e: pExp list) (run: pExp list) : pExp =
     | [t] -> Plus(run@[t])
     | _ -> Plus(run)
 
-let simplify1 (e:pExp): pExp =
+let rec expand_multiply (e1: pExp) (e2: pExp): pExp =
+  match e1, e2 with
+    | Term(c1, v1), Term(c2, v2) -> Term(c1*c2, v1+v2)
+    | Term(c1,v1), Plus(plist) -> Plus((List.map(expand_multiply e1)plist))
+    | Plus(plist), Term(c2,v2) -> Plus((List.map(expand_multiply e2)plist))
+    (*| Plus(plist1), Plus(plist2) -> List.iter (List.map(expand_multiply e2)plist2) plist1*)
+    | _ -> e1
+  
+
+
+let rec simplify1 (e:pExp): pExp =
   (match e with
     | Term(c,v) -> e
     | Plus(plist) -> (let _e = sort (flatten_sum e) in match _e with 
                                         | Plus(plist1) -> simplify_add plist1 [])
+    | Times(plist) -> (match plist with
+                        | t1::t2::tl -> simplify1 (expand_multiply t1 t2)
+                        | _ -> e)
     | _ -> e)
 
 (* 
