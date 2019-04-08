@@ -242,8 +242,15 @@ let rec expand_multiply (e1: pExp) (e2: pExp): pExp =
     | Term(c1, v1), Term(c2, v2) -> Term(c1*c2, v1+v2)
     | Term(c1,v1), Plus(plist) -> Plus((List.map(expand_multiply e1)plist))
     | Plus(plist), Term(c2,v2) -> Plus((List.map(expand_multiply e2)plist))
-    (*| Plus(plist1), Plus(plist2) -> List.iter (List.map(expand_multiply e2)plist2) plist1*)
-    | _ -> e1
+    | Plus(plist1), Plus(plist2) -> Plus(expand [] plist1 plist2);
+    | _ -> e1 (* TODO check for errors *)
+
+    and expand (acc: pExp list) (plist1: pExp list) (plist2: pExp list): pExp list = match plist1 with 
+      | [t] -> acc @ expand_plus plist2 t;
+      | t::tl -> expand (acc @ expand_plus plist2 t) plist2 tl;
+
+    and expand_plus (p: pExp list) (e: pExp): pExp list = 
+      List.map(expand_multiply e)p;;
   
 
 
@@ -253,8 +260,8 @@ let rec simplify1 (e:pExp): pExp =
     | Plus(plist) -> (let _e = sort (flatten_sum e) in match _e with 
                                         | Plus(plist1) -> simplify_add plist1 [])
     | Times(plist) -> (match plist with
-                        | t1::t2::tl -> simplify1 (expand_multiply t1 t2)
-                        | _ -> e)
+                        | t1::t2::tl -> simplify1 (Times([(expand_multiply t1 t2)]@tl))
+                        | [t] -> simplify1 t)
     | _ -> e)
 
 (* 
