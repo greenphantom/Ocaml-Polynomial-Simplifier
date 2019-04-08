@@ -289,7 +289,8 @@ let rec simplify (e:pExp): pExp =
     let rE = simplify1 e in
       print_pExp rE;
       if (equal_pExp e rE) then
-        e
+        (Printf.printf("--------Final Result-------\n");
+        e)
       else  
         simplify(rE)
 ;;
