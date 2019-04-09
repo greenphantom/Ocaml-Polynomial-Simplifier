@@ -12,4 +12,4 @@ Tests are run with the given command - make tests
 
 Bonus: divide can work with two terms being divided. Test 21 shows this. Dividing a Times or Plus type will not work.
 
-To run, simply call "make tests" at it will cat the contents of all files to the terminal.
+To run, simply call "make tests" as it will cat the contents of all files to the terminal.
