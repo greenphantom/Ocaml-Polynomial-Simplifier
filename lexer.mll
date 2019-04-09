@@ -10,6 +10,7 @@ rule token = parse
   | '+'                 { PLUS }
   | '-'                 { MINUS }
   | '*'                 { TIMES }
+  | '/'                 { DIVIDE }
   | '('                 { LPAR }
   | ')'                 { RPAR }
   | '^'                 { POW }

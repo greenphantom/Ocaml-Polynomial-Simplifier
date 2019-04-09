@@ -15,6 +15,7 @@ type pExp =
     Plus([Term(2,1); Term(1,0)])
   *)
   | Times of pExp list (* List of terms multiplied *)
+  | Divide of pExp*pExp
 
 
 (*
@@ -46,6 +47,9 @@ let rec from_expr (_e: expr) : pExp = match _e with
     | Times(plist), Term(c2, v2) -> Times(plist@[_e2])
     | Times(plist1), Times(plist2) -> Times(plist1@plist2)
     | _ -> Times([_e1; _e2]))
+  | Div(e1,e2) -> (let _e1 = from_expr e1 in let _e2 = from_expr e2 in match _e1, _e2 with
+    | (Term(c1,v1), Term(c2,v2)) -> Term(c1/c2,v1-v2)
+    | _ -> Divide(_e1, _e2))
   | Pow(e,i) -> (let _ex = from_expr e in match _ex with 
     | Term(c,p) -> Term((float_of_int c) ** (float_of_int i) |> int_of_float, p * i)
     | _ -> (from_pow _ex [] i)

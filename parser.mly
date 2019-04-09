@@ -4,7 +4,7 @@
 
 %token <int> NUM
 %token <char> VAR
-%token PLUS MINUS TIMES POW
+%token PLUS MINUS TIMES DIVIDE POW
 %token LPAR RPAR
 %token EOL
 %left PLUS MINUS
@@ -29,6 +29,7 @@ expr:
 |   v_expr                      { $1 }
 |   LPAR expr RPAR              { $2 }
 |   expr TIMES expr             { Mul($1,$3) }
+|   expr DIVIDE expr            { Div($1,$3) }
 |   expr PLUS expr              { Add($1, $3) }
 |   expr MINUS expr             { Sub($1, $3) }
 |   expr POW NUM                { Pow($1, $3) }
